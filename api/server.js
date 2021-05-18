@@ -2,6 +2,8 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 
+const userRouter = require('./users/users-router')
+
 /**
   Do what needs to be done to support sessions with the `express-session` package!
   To respect users' privacy, do NOT send them a cookie unless they log in.
@@ -24,6 +26,8 @@ server.use(cors());
 server.get("/", (req, res) => {
   res.json({ api: "up" });
 });
+
+server.use('/api/users', userRouter)
 
 server.use((err, req, res, next) => { // eslint-disable-line
   res.status(err.status || 500).json({
