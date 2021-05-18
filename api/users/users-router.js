@@ -34,7 +34,7 @@ router.get('/', async (req, res, next) => {
     const allUsers = await User.find()
     res.json(allUsers)
   } catch (err) {
-    console.log(err)
+    next(err)
   }
 })
 
