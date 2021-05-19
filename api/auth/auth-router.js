@@ -8,29 +8,8 @@ const {
 const bcrypt = require('bcryptjs')
 const Users = require('../users/users-model')
 
-/**
-  1 [POST] /api/auth/register { "username": "sue", "password": "1234" }
 
-  response:
-  status 200
-  {
-    "user_id": 2,
-    "username": "sue"
-  }
-
-  response on username taken:
-  status 422
-  {
-    "message": "Username taken"
-  }
-
-  response on password three chars or less:
-  status 422
-  {
-    "message": "Password must be longer than 3 chars"
-  }
- */
-
+// post - register as a new user
 router.post('/register', checkUsernameFree, checkPasswordLength, async (req, res, next) => {
   const { username, password } = req.body
   
@@ -62,7 +41,7 @@ router.post('/register', checkUsernameFree, checkPasswordLength, async (req, res
   }
  */
 
-router.post('/login', checkUsernameExists, checkPasswordLength, (req, res, next) => {
+router.post('/login', checkUsernameExists, (req, res, next) => {
   res.json({message: 'user login'})
 })
 
