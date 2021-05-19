@@ -38,9 +38,7 @@ router.post('/register', checkUsernameFree, checkPasswordLength, async (req, res
 
   Users.add({username, password: hash})
     .then(([user]) => {
-      res.status(201).json({
-        message: `Welcome, ${user.username}!`
-      })
+      res.status(201).json(user)
     })
     .catch(err => {
       next(err)
