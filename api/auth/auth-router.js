@@ -6,7 +6,7 @@ const {
   checkPasswordLength 
 } = require('./auth-middleware')
 const bcrypt = require('bcryptjs')
-const Users = require('../users/users-model')
+const User = require('../users/users-model')
 
 
 // post - register as a new user
@@ -15,7 +15,7 @@ router.post('/register', checkUsernameFree, checkPasswordLength, async (req, res
   
   const hash = bcrypt.hashSync(password, 8 )
 
-  Users.add({username, password: hash})
+  User.add({username, password: hash})
     .then(([user]) => {
       res.status(201).json(user)
     })
@@ -42,7 +42,12 @@ router.post('/register', checkUsernameFree, checkPasswordLength, async (req, res
  */
 
 router.post('/login', checkUsernameExists, (req, res, next) => {
-  res.json({message: 'user login'})
+  const { username } = req.body
+
+  res.json({
+    message: `Welcome back, ${username}`
+  })
+  // note, we are not handling any errors here because the middleware is doing that for us
 })
 
 

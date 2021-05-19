@@ -1,4 +1,5 @@
 const User = require('../users/users-model')
+const bcrypt = require('bcryptjs')
 /*
   If the user does not have a session saved in the server
 
@@ -43,19 +44,23 @@ async function checkUsernameFree(req, res, next) {
   }
 */
 function checkUsernameExists(req, res, next) {
-  const { username } = req.body
+  const { username, password } = req.body
 
   User.findBy({username})
     .then(([user]) => {
-      if (user) {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        req.session.user = user
         next()
       } else {
         next({
           status: 401,
-          message: "Invalid Credentials"
+          message: 'Invalid credentials'
         })
-      } 
-  })
+      }
+    })
+    .catch(err => {
+      next(err)
+    })
 }
 
 
