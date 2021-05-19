@@ -5,6 +5,7 @@ const {
   checkUsernameExists, 
   checkPasswordLength 
 } = require('./auth-middleware')
+const bcrypt = require('bcryptjs')
 const Users = require('../users/users-model')
 
 /**
@@ -30,7 +31,21 @@ const Users = require('../users/users-model')
   }
  */
 
+router.post('/register', checkUsernameFree, checkPasswordLength, async (req, res, next) => {
+  const { username, password } = req.body
+  
+  const hash = bcrypt.hashSync(password, 8 )
 
+  Users.add({username, password: hash})
+    .then(([user]) => {
+      res.status(201).json({
+        message: `Welcome, ${user.username}!`
+      })
+    })
+    .catch(err => {
+      next(err)
+    })
+})
 
 
 /**
@@ -49,7 +64,7 @@ const Users = require('../users/users-model')
   }
  */
 
-router.post('/login', checkUsernameExists,  (req, res, next) => {
+router.post('/login', checkUsernameExists, checkPasswordLength, (req, res, next) => {
   res.json({message: 'user login'})
 })
 
