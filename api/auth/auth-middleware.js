@@ -42,19 +42,22 @@ async function checkUsernameFree(req, res, next) {
     "message": "Invalid credentials"
   }
 */
-async function checkUsernameExists(req, res, next) {
+function checkUsernameExists(req, res, next) {
   const { username } = req.body
 
-User.findBy(username)
-    .then(user => {
+  User.findBy({username})
+    .then(([user]) => {
       if (user) {
         next()
-      }
-    })
-    .catch(err => {
-      res.status(404).json({message: "Invalid credentials"})
-    })
+      } else {
+        next({
+          status: 401,
+          message: "Invalid Credentials"
+        })
+      } 
+  })
 }
+
 
 /*
   If password is missing from req.body, or if it's 3 chars or shorter

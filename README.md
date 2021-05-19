@@ -43,7 +43,7 @@ Write the following auth middlewares inside `api/auth/auth-middleware.js`:
 - [ ] `restricted`
 - [X] `checkUsernameFree`
 - [X] `checkPasswordLength`
-- [ ] `checkUsernameExists`
+- [X] `checkUsernameExists`
 
 #### 2C - Endpoints
 
