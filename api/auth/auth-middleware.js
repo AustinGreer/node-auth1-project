@@ -1,3 +1,5 @@
+const User = require('../users/users-model')
+const bcrypt = require('bcryptjs')
 /*
   If the user does not have a session saved in the server
 
@@ -6,8 +8,15 @@
     "message": "You shall not pass!"
   }
 */
-function restricted() {
-
+function restricted(req, res, next) {
+  if (req.session.user) {
+    next()
+  } else {
+    next({
+      status: 401, 
+      message: 'You shall not pass!'
+    })
+  }
 }
 
 /*
@@ -18,8 +27,19 @@ function restricted() {
     "message": "Username taken"
   }
 */
-function checkUsernameFree() {
+async function checkUsernameFree(req, res, next) {
+  try {
+    const { username } = req.body
+    const existingName = await User.findBy({username})
 
+    if (existingName.length < 1) {
+      next()
+    } else {
+      next({status: 422, message: 'Username taken'})
+    }
+  } catch (err) {
+    next(err)
+  }
 }
 
 /*
@@ -30,9 +50,26 @@ function checkUsernameFree() {
     "message": "Invalid credentials"
   }
 */
-function checkUsernameExists() {
+function checkUsernameExists(req, res, next) {
+  const { username, password } = req.body
 
+  User.findBy({username})
+    .then(([user]) => {
+      if (user && bcrypt.compareSync(password, user.password)) {
+        req.session.user = user
+        next()
+      } else {
+        next({
+          status: 401,
+          message: 'Invalid credentials'
+        })
+      }
+    })
+    .catch(err => {
+      next(err)
+    })
 }
+
 
 /*
   If password is missing from req.body, or if it's 3 chars or shorter
@@ -42,8 +79,23 @@ function checkUsernameExists() {
     "message": "Password must be longer than 3 chars"
   }
 */
-function checkPasswordLength() {
+async function checkPasswordLength(req, res, next) {
+  const { password } = req.body
 
+  if (password && password.length > 3) {
+    next()
+  } else {
+    next({
+      status: 422,
+      message: "Password must be longer than 3 chars"
+    })
+  }
 }
 
 // Don't forget to add these to the `exports` object so they can be required in other modules
+module.exports = {
+  restricted, 
+  checkUsernameFree, 
+  checkUsernameExists, 
+  checkPasswordLength
+}
